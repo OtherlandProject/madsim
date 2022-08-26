@@ -94,13 +94,12 @@ fn gen_add_rpc_handler(input: &mut ItemImpl, calls: &[RpcFn]) {
     });
     let serve = quote! {
         pub async fn serve(self, addr: std::net::SocketAddr) -> std::io::Result<()> {
-            let ep = madsim::net::Endpoint::bind(addr).await?;
+            let ep = std::sync::Arc::new(madsim::net::Endpoint::bind(addr).await?);
             self.serve_on(ep).await
         }
     };
     let serve_on = quote! {
-        pub async fn serve_on(self, ep: madsim::net::Endpoint) -> std::io::Result<()> {
-            let ep = std::sync::Arc::new(ep);
+        pub async fn serve_on(self, ep: std::sync::Arc<madsim::net::Endpoint>) -> std::io::Result<()> {
             #(#bodys)*
             madsim::export::futures::future::pending::<()>().await;
             Ok(())

@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use madsim::{net::Endpoint, Request};
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +27,7 @@ async fn main() {
         println!("reply: {:?}", reply);
     } else {
         // server
-        let ep = Endpoint::bind("127.0.0.1:0").await.unwrap();
+        let ep = Arc::new(Endpoint::bind("127.0.0.1:0").await.unwrap());
         println!("listening on {}", ep.local_addr().unwrap());
         Server.serve_on(ep).await.unwrap();
     }
